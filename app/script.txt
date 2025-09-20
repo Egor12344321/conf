@@ -1,0 +1,3 @@
+echo Начало
+ls -la
+cd /home/user
