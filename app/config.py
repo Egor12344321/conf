@@ -136,6 +136,25 @@ class VirtualFileSystem:
         if file_node and file_node['type'] == 'file':
             return file_node['content']
         return None
+    def create_directory(self, path, name, permissions='755'):
+        parent_dir = self._resolve_path(path)
+        if parent_dir and parent_dir['type'] == 'directory':
+            if name not in parent_dir['children']:
+                parent_dir['children'][name] = {
+                    'type': 'directory',
+                    'name': name,
+                    'permissions': permissions,
+                    'children': {}
+                }
+                return True
+        return False
+
+    def change_permissions(self, path, permissions):
+        node = self._resolve_path(path)
+        if node:
+            node['permissions'] = permissions
+            return True
+        return False
 
 class ShellEmulator:
     def __init__(self, root, vfs_path=None, script_path=None):
@@ -247,7 +266,11 @@ class ShellEmulator:
             
         elif command_name == "head":
             self._execute_head(args)
-            
+
+        elif command_name == "mkdir":
+            self._execute_mkdir(args)
+        elif command_name == "chmod":
+            self._execute_chmod(args)    
         else:
             self.print_output(f"Ошибка: неизвестная команда '{command_name}'\n")
     
@@ -353,6 +376,43 @@ class ShellEmulator:
         self.print_output(f"[{username}@{hostname}]$ {command_text}\n")
         
         self.execute_command(command_text)
+
+    def _execute_mkdir(self, args):
+        if not self.vfs_path:
+            self.print_output("Ошибка: VFS не загружена\n")
+            return
+            
+        if not args:
+            self.print_output("Ошибка: команда 'mkdir' требует имя директории\n")
+            return
+            
+        dir_name = args[0]
+        if self.vfs.create_directory(self.vfs.current_path, dir_name):
+            self.print_output(f"Директория '{dir_name}' создана\n")
+        else:
+            self.print_output(f"Ошибка: не удалось создать директорию '{dir_name}'\n")
+
+    def _execute_chmod(self, args):
+        if not self.vfs_path:
+            self.print_output("Ошибка: VFS не загружена\n")
+            return
+            
+        if len(args) < 2:
+            self.print_output("Ошибка: команда 'chmod' требует права и путь\n")
+            return
+            
+        permissions = args[0]
+        path = args[1]
+        
+    
+        if not (permissions.isdigit() and len(permissions) == 3):
+            self.print_output("Ошибка: неверный формат прав доступа\n")
+            return
+            
+        if self.vfs.change_permissions(path, permissions):
+            self.print_output(f"Права '{path}' изменены на {permissions}\n")
+        else:
+            self.print_output(f"Ошибка: не удалось изменить права '{path}'\n")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Эмулятор командной оболочки')

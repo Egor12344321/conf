@@ -1,0 +1,11 @@
+echo начало mkdir и chmod
+ls
+mkdir new_folder
+ls
+mkdir another_dir
+ls
+chmod 700 new_folder
+ls
+chmod 644 readme.txt
+ls
+echo конец
