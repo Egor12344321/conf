@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<directory name="/" permissions="755">
+    <file name="readme.txt" permissions="644" encoding="base64">VGhpcyBpcyBhIHRlc3QgZmlsZQ==</file>
+    <file name="hello.txt" permissions="644" encoding="base64">SGVsbG8sIFdvcmxkIQ==</file>
+    <directory name="home" permissions="755">
+        <directory name="user" permissions="755">
+            <file name="document.txt" permissions="644" encoding="base64">TXkgZG9jdW1lbnQgY29udGVudA==</file>
+        </directory>
+    </directory>
+    <directory name="etc" permissions="755">
+        <file name="config.conf" permissions="644" encoding="base64">c2V0dGluZz12YWx1ZQ==</file>
+    </directory>
+</directory>

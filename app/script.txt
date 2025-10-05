@@ -1,0 +1,12 @@
+echo тестирования VFS
+ls
+cd home
+ls
+cd user
+ls
+cd /etc
+ls
+lemvvelv 
+vfs-save
+vfs-save saved_vfs.xml
+echo конец
