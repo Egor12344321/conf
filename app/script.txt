@@ -1,3 +1,4 @@
+
 echo тестирования VFS
 ls
 cd home
@@ -10,3 +11,7 @@ lemvvelv
 vfs-save
 vfs-save saved_vfs.xml
 echo конец
+echo Начало
+ls -la
+cd /home/user
+

@@ -146,13 +146,16 @@ class ShellEmulator:
         
         self.vfs_path = vfs_path
         self.script_path = script_path
+
         self.vfs = VirtualFileSystem()
+
         
         print(f"Параметры запуска:")
         print(f"  VFS путь: {vfs_path if vfs_path else 'Не указан (используется по умолчанию)'}")
         print(f"  Скрипт: {script_path if script_path else 'Не указан (интерактивный режим)'}")
         print("-" * 50)
         
+
         if vfs_path and os.path.exists(vfs_path):
             try:
                 self.vfs.load_from_xml(vfs_path)
@@ -160,6 +163,7 @@ class ShellEmulator:
             except Exception as e:
                 print(f"Ошибка загрузки VFS: {e}")
         
+
         self.output_area = scrolledtext.ScrolledText(root, state='disabled', height=30)
         self.output_area.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         
@@ -268,6 +272,10 @@ class ShellEmulator:
             else:
                 self.print_output("Команда 'cd' требует аргумент - путь к директории\n")
         else:
+            self.print_output(f"Команда 'ls' вызвана с аргументами: {args}\n")
+            
+        elif command_name == "cd":
+
             if args:
                 self.print_output(f"Команда 'cd' пытается перейти в директорию: {args[0]}\n")
             else:
@@ -288,6 +296,14 @@ class ShellEmulator:
             self.print_output(f"VFS сохранена в: {save_path}\n")
         except Exception as e:
             self.print_output(f"Ошибка сохранения VFS: {str(e)}\n")
+
+                
+        elif command_name == "echo":
+            self.print_output(f"{' '.join(args)}\n")
+            
+        else:
+            self.print_output(f"Ошибка: неизвестная команда '{command_name}'\n")
+
     
     def process_command(self, event):
         command_text = self.command_entry.get().strip()
