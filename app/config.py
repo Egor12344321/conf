@@ -131,7 +131,7 @@ class VirtualFileSystem:
             return True
         return False
     
-    def get_file_content(self, path):
+    def read_file(self, path):
         file_node = self._resolve_path(path)
         if file_node and file_node['type'] == 'file':
             return file_node['content']
@@ -146,16 +146,13 @@ class ShellEmulator:
         
         self.vfs_path = vfs_path
         self.script_path = script_path
-
         self.vfs = VirtualFileSystem()
-
         
         print(f"Параметры запуска:")
         print(f"  VFS путь: {vfs_path if vfs_path else 'Не указан (используется по умолчанию)'}")
         print(f"  Скрипт: {script_path if script_path else 'Не указан (интерактивный режим)'}")
         print("-" * 50)
         
-
         if vfs_path and os.path.exists(vfs_path):
             try:
                 self.vfs.load_from_xml(vfs_path)
@@ -163,7 +160,6 @@ class ShellEmulator:
             except Exception as e:
                 print(f"Ошибка загрузки VFS: {e}")
         
-
         self.output_area = scrolledtext.ScrolledText(root, state='disabled', height=30)
         self.output_area.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         
@@ -246,6 +242,12 @@ class ShellEmulator:
         elif command_name == "vfs-save":
             self._execute_vfs_save(args)
             
+        elif command_name == "rev":
+            self._execute_rev(args)
+            
+        elif command_name == "head":
+            self._execute_head(args)
+            
         else:
             self.print_output(f"Ошибка: неизвестная команда '{command_name}'\n")
     
@@ -272,10 +274,6 @@ class ShellEmulator:
             else:
                 self.print_output("Команда 'cd' требует аргумент - путь к директории\n")
         else:
-            self.print_output(f"Команда 'ls' вызвана с аргументами: {args}\n")
-            
-        elif command_name == "cd":
-
             if args:
                 self.print_output(f"Команда 'cd' пытается перейти в директорию: {args[0]}\n")
             else:
@@ -296,14 +294,55 @@ class ShellEmulator:
             self.print_output(f"VFS сохранена в: {save_path}\n")
         except Exception as e:
             self.print_output(f"Ошибка сохранения VFS: {str(e)}\n")
-
-                
-        elif command_name == "echo":
-            self.print_output(f"{' '.join(args)}\n")
+    
+    def _execute_rev(self, args):
+        if not self.vfs_path:
+            self.print_output("Ошибка: VFS не загружена\n")
+            return
             
-        else:
-            self.print_output(f"Ошибка: неизвестная команда '{command_name}'\n")
-
+        if not args:
+            self.print_output("Ошибка: команда 'rev' требует путь к файлу\n")
+            return
+            
+        content = self.vfs.read_file(args[0])
+        if content is None:
+            self.print_output(f"Ошибка: файл '{args[0]}' не найден\n")
+            return
+            
+        reversed_content = '\n'.join(reversed(content.split('\n')))
+        self.print_output(reversed_content + '\n')
+    
+    def _execute_head(self, args):
+        if not self.vfs_path:
+            self.print_output("Ошибка: VFS не загружена\n")
+            return
+            
+        if not args:
+            self.print_output("Ошибка: команда 'head' требует путь к файлу\n")
+            return
+            
+        lines_count = 10
+        file_path = args[0]
+        
+        if len(args) > 1 and args[0] == '-n':
+            try:
+                lines_count = int(args[1])
+                file_path = args[2] if len(args) > 2 else None
+            except ValueError:
+                self.print_output("Ошибка: неверное количество строк\n")
+                return
+                
+        if not file_path:
+            self.print_output("Ошибка: не указан файл\n")
+            return
+            
+        content = self.vfs.read_file(file_path)
+        if content is None:
+            self.print_output(f"Ошибка: файл '{file_path}' не найден\n")
+            return
+            
+        lines = content.split('\n')[:lines_count]
+        self.print_output('\n'.join(lines) + '\n')
     
     def process_command(self, event):
         command_text = self.command_entry.get().strip()

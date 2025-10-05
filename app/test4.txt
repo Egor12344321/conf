@@ -1,0 +1,13 @@
+echo Начало 
+rev readme.txt
+rev hello.txt
+rev nofile.txt
+head readme.txt
+head -n 2 hello.txt
+head -n 1 readme.txt
+head nofile.txt
+cd home
+head document.txt
+cd /etc
+head config.conf
+echo конец
