@@ -168,8 +168,8 @@ class ShellEmulator:
         self.vfs = VirtualFileSystem()
         
         print(f"Параметры запуска:")
-        print(f"  VFS путь: {vfs_path if vfs_path else 'Не указан'}")
-        print(f"  Скрипт: {script_path if script_path else 'Не указан'}")
+        print(f"  VFS путь: {vfs_path if vfs_path else 'Не указан (используется по умолчанию)'}")
+        print(f"  Скрипт: {script_path if script_path else 'Не указан (интерактивный режим)'}")
         print("-" * 50)
         
         if vfs_path and os.path.exists(vfs_path):
